@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: ai-code-review-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aicode_review
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: code-review-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.aicodereview.backend.messaging"
+        spring.json.value.default.type: "com.aicodereview.backend.messaging.ReviewRequestedEvent"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  kafka:
+    topics:
+      review-requests: code-review-requests
+
+claude:
+  api:
+    base-url: https://api.anthropic.com
+    key: ${ANTHROPIC_API_KEY:}
+    model: claude-sonnet-4-20250514
+    anthropic-version: 2023-06-01
+    max-tokens: 1200
+
+server:
+  port: 8080
